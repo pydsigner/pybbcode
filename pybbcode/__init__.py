@@ -32,7 +32,7 @@ JavaScript. This must be done BEFORE running the code through the parser to
 avoid excaping the translated BBCode.
 '''
 
-__version__ = '1.0'
+__version__ = '1.1'
 
 import re
 
@@ -40,14 +40,15 @@ import re
 __all__ = ['TagSet', 'default_set', 'extras']
 
 
-class TagSet(dict):
+class TagSet(list):
     '''
     The PyBBCode tag manager and engine.
     '''
     ignore_re = re.compile('(.*?)\[ignore\](.*)\[/ignore\](.*)', re.DOTALL)
     
     def add_tag(self, bbcode, html):
-        self[re.compile(bbcode, re.DOTALL)] = html
+        # dot matches newlines, case-sensitivity off, multiline mode on.
+        self.append((re.compile(bbcode, re.S|re.I|re.M), html))
     
     def replace_groups(self, match, s):
         groups = match.groups()
@@ -57,13 +58,14 @@ class TagSet(dict):
         '''
         Parse text containing BBCode.
         '''
-        for t in self:
-            m = t.search(code)
+        for i in range(len(self)):
+            t = self[i]
+            m = t[0].search(code)
             while m:
                 b, e = m.span()
-                r = self.replace_groups(m, self[t])
+                r = self.replace_groups(m, t[1])
                 code = code[:b] + r + code[e:]
-                m = t.search(code)
+                m = t[0].search(code)
         return code
     
     def parse_with_ignore(self, code):
@@ -89,6 +91,7 @@ def default_set():
     tag_set.add_tag(r'\[i\](.*?)\[/i\]', '<i>%(0)s</i>')
     tag_set.add_tag(r'\[u\](.*?)\[/u\]', '<u>%(0)s</u>')
     
+    tag_set.add_tag(r'\[img\](.*?)\[/img\]', '<img src="%(0)s">')
     tag_set.add_tag(r'\[url\](.*?)\[/url\]', '<a href="%(0)s">%(0)s</a>')
     tag_set.add_tag(r'\[url="(.*?)"\](.*?)\[/url\]', 
                     '<a href="%(0)s">%(1)s</a>')
@@ -101,6 +104,13 @@ def default_set():
     tag_set.add_tag(r'\[small\](.*?)\[/small\]', '<small>%(0)s</small>')
     tag_set.add_tag(r'\[size=([7-9]|50|[1-4]\d)\](.*?)\[/size\]', 
                     '<span style="font-size: %(0)spx">%(1)s</span>')
+    
+    tag_set.add_tag(r'\[code\](.*?)\[/code\]', 
+                    '<div class="bbcode-code">%(0)s</div>')
+    
+    tag_set.add_tag(r'\[list\](.*?)\[/list\]', '<ul>%(0)s</ul>')
+    tag_set.add_tag(r'\[list=\](.*?)\[/list\]', '<ol>%(0)s</ol>')
+    tag_set.add_tag(r'\[\*\](.*?)$', '<li>%(0)s</li>')
     
     return tag_set
 
