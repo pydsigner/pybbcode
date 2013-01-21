@@ -93,7 +93,7 @@ def default_set():
     
     tag_set.add_tag(r'\[img\](.*?)\[/img\]', '<img src="%(0)s">')
     tag_set.add_tag(r'\[url\](.*?)\[/url\]', '<a href="%(0)s">%(0)s</a>')
-    tag_set.add_tag(r'\[url="?(.*?)"\](.*?)\[/url\]', 
+    tag_set.add_tag(r'\[url="?(.*?)"?\](.*?)\[/url\]', 
                     '<a href="%(0)s">%(1)s</a>')
     
     tag_set.add_tag(r'\[color="?(.*?)"?\](.*?)\[/color\]', 
