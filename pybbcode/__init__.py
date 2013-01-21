@@ -47,8 +47,8 @@ class TagSet(list):
     ignore_re = re.compile('(.*?)\[ignore\](.*)\[/ignore\](.*)', re.DOTALL)
     
     def add_tag(self, bbcode, html):
-        # dot matches newlines, case-sensitivity off, multiline mode on.
-        self.append((re.compile(bbcode, re.S|re.I|re.M), html))
+        # dot matches newlines, case-sensitivity off, multiline mode on, unicode on.
+        self.append((re.compile(bbcode, re.S|re.I|re.M|re.U), html))
     
     def replace_groups(self, match, s):
         groups = match.groups()
