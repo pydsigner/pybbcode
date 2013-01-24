@@ -47,8 +47,8 @@ class TagSet(list):
     ignore_re = re.compile('(.*?)\[ignore\](.*)\[/ignore\](.*)', re.DOTALL)
     
     def add_tag(self, bbcode, html):
-        # dot matches newlines, case-sensitivity off, multiline mode on.
-        self.append((re.compile(bbcode, re.S|re.I|re.M), html))
+        # dot matches newlines, case-sensitivity off, multiline mode on, unicode on.
+        self.append((re.compile(bbcode, re.S|re.I|re.M|re.U), html))
     
     def replace_groups(self, match, s):
         groups = match.groups()
@@ -93,16 +93,16 @@ def default_set():
     
     tag_set.add_tag(r'\[img\](.*?)\[/img\]', '<img src="%(0)s">')
     tag_set.add_tag(r'\[url\](.*?)\[/url\]', '<a href="%(0)s">%(0)s</a>')
-    tag_set.add_tag(r'\[url="(.*?)"\](.*?)\[/url\]', 
+    tag_set.add_tag(r'\[url="?(.*?)"?\](.*?)\[/url\]', 
                     '<a href="%(0)s">%(1)s</a>')
     
-    tag_set.add_tag(r'\[color="(.*?)"\](.*?)\[/color\]', 
+    tag_set.add_tag(r'\[color="?(.*?)"?\](.*?)\[/color\]', 
                     '<span style="color: %(0)s">%(1)s</span>')
     
     tag_set.add_tag(r'\[big\](.*?)\[/big\]', 
                     '<span style="font-size: 130%">%(0)s</span>')
     tag_set.add_tag(r'\[small\](.*?)\[/small\]', '<small>%(0)s</small>')
-    tag_set.add_tag(r'\[size=([7-9]|50|[1-4]\d)\](.*?)\[/size\]', 
+    tag_set.add_tag(r'\[size="?([7-9]|50|[1-4]\d)"?\](.*?)\[/size\]', 
                     '<span style="font-size: %(0)spx">%(1)s</span>')
     
     tag_set.add_tag(r'\[code\](.*?)\[/code\]', 
@@ -115,5 +115,5 @@ def default_set():
     return tag_set
 
 
-extras = {'css': (r'\[css="(\w*?)"\](.*?)\[/css\]', 
+extras = {'css': (r'\[css="?(\w*?)"?\](.*?)\[/css\]', 
                   '<span class="bbcode-%(0)s">%(1)s</span>')}
